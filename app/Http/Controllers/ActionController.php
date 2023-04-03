@@ -131,7 +131,7 @@ class ActionController extends Controller
     public function destroy(Action $action, $id)
     {
         try {
-            $action = Action::findById($id);
+            $action = Action::findOrFail($id);
             $action->delete();
 
             return response()->json([
