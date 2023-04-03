@@ -22,15 +22,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/test', [TestController::class, 'returnResponse']);
-Route::post('/test-post', [TestController::class, 'testPost']);
 
-
-Route::get('/invoke', InvokableController::class);
-
-Route::post("/store-action", [ActionController::class, "store"]);
-Route::delete("/delete-action", [ActionController::class, "destroy"]);
-
-//database queries
-
-Route::get('/query', [QueryController::class, 'actors']);
+Route::group(['prefix' => 'action'], function () {
+    Route::get('/', [ActionController::class, 'index']);
+    Route::post("/create", [ActionController::class, "store"]);
+    Route::get("/show/{id}", [ActionController::class, "show"]);
+    Route::patch("/update/{id}", [ActionController::class, "update"]);
+    Route::delete("/delete/{id}", [ActionController::class, "destroy"]);
+});

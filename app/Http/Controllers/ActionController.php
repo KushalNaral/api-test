@@ -13,7 +13,13 @@ class ActionController extends Controller
      */
     public function index()
     {
-        //
+        $actions = Action::all();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Actions retrieved successfully.',
+            'data' => $actions
+        ], 200);
     }
 
     /**
@@ -21,7 +27,6 @@ class ActionController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
@@ -30,15 +35,11 @@ class ActionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'string',
-            'description' => 'string',
+            'name' => 'required | string | max:255 | unique:actions',
+            'description' => 'string ',
             'type' => 'string',
             'status' => 'string',
-            'priority' => 'string',
-            'due_date' => 'string',
-            'user_id' => 'string',
         ]);
-
 
         if ($validator->fails()) {
             return response()->json([
@@ -55,21 +56,32 @@ class ActionController extends Controller
             'message' => 'Action created successfully.',
             'data' => $action
         ], 201);
-
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Action $action)
+    public function show(Action $action, $id)
     {
-        //
+        try {
+            $action = Action::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Action retrieved successfully.',
+                'data' => $action
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e,
+            ], 402);
+        }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Action $action)
+    public function edit(Action $action, Request $request)
     {
         //
     }
@@ -77,23 +89,61 @@ class ActionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Action $action)
+    public function update(Request $request, Action $action, $id)
     {
-        //
+        try {
+
+            $action = Action::findOrFail($id);
+
+            $validator = Validator::make($request->all(), [
+                'name' => "required | string | max:255 | unique:actions,name," . request()->id,
+                'description' => 'string ',
+                'type' => 'string',
+                'status' => 'string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation Error.',
+                    'data' => $validator->errors()
+                ], 400);
+            }
+
+            $action->update($request->all());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Action updated successfully.',
+                'data' => $action
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e,
+            ], 402);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Action $action)
+    public function destroy(Action $action, $id)
     {
-        $action = Action::find(Action::latest()->first()->id);
-        $action->delete();
+        try {
+            $action = Action::findById($id);
+            $action->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Action deleted successfully.',
-            'data' => $action
-        ], 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'Action deleted successfully.',
+                'data' => $action
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e,
+            ], 402);
+        }
     }
 }
