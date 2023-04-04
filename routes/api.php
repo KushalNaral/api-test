@@ -22,6 +22,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//test routes
+
+Route::get('/test', [TestController::class, 'returnResponse']);
+Route::post('/test-post', [TestController::class, 'testPost']);
 
 Route::group(['prefix' => 'action'], function () {
     Route::get('/', [ActionController::class, 'index']);
@@ -30,3 +34,5 @@ Route::group(['prefix' => 'action'], function () {
     Route::patch("/update/{id}", [ActionController::class, "update"]);
     Route::delete("/delete/{id}", [ActionController::class, "destroy"]);
 });
+
+
